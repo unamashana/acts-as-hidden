@@ -1,0 +1,92 @@
+ActsAsHidden
+============
+
+A plugin to help you make an Active Record object invisible. Invisible items don't show up in find operations but can be fetched by passing a :with_hidden=>true key. They also contain a passphrase field 
+that can be used to make public urls for hidden items on your website. 
+
+Tested upto Rails 2.2.2
+
+Requirements
+============
+
+If you want to make the model Foo invisible, you need to put the following in the class definition
+
+class Foo < ActiveRecord::Base
+  
+   .....
+
+   acts_as_hidden
+
+   ....
+
+end
+
+You also need to add the following field to your Foos table (with a migration)
+
+  add_column  :foo,       :passphrase,  :string,  :limit=>40
+
+Example
+=======
+
+Hiding and finding Objects:
+---------------------------
+
+To make an instance of Foo invisible, you need to call set_invisible on it.
+
+  @foo = Foo.find(id)
+
+  # Make it invisible
+  @foo.set_invisible
+
+Searching for foo with id will now return nothing
+
+  @foo = Foo.find(id) # => nil
+
+
+To find foo, you need to 
+
+  @foo = Foo.find_any(id) # => returns foo with id back
+
+To do regular find(:all,:condtions=>"blah") kind of searches, you need to pass :with_hidden key
+
+  Foo.find(:all,:conditions=>'blah', :with_hidden=>true)
+
+You can create public urls like /foo/show?p=12313jmnk90890hasdh and see if params[:p] matches with @foo.passphrase
+
+UnHiding Objects
+----------------
+
+To make foo visible again
+
+  @foo.set_visible
+
+Hiding Associations after hiding parent
+---------------------------------------
+
+To do some post processing after hiding/unhiding, just implement these two callbacks. Remeber, its just optional
+
+class Foo < ActiveRecord::Base
+
+  ...
+
+  # Plugin calls this after hiding this instance
+  def after_hiding
+    # Do whatever you want, you can hide association, delete feeds, remove this item from search index .. whatever
+  end
+
+  def after_unhiding
+    # Unhide children, put back in search index etc .. whatever you want
+  end
+
+  ...
+
+end
+
+More detailed help and test cases coming soon
+
+Credits
+=======
+
+Thanks to Acts as Paranoid (http://ar-paranoid.rubyforge.org/) for providing inspiration for this plugin
+
+Copyright (c) 2008 [prateek@muziboo.com], released under the MIT license
