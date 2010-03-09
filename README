@@ -21,9 +21,10 @@ class Foo < ActiveRecord::Base
 
 end
 
-You also need to add the following field to your Foos table (with a migration)
+You also need to add the following fields to your Foos table (with a migration)
 
-  add_column  :foo,       :passphrase,  :string,  :limit=>40
+  add_column  :foo,       :visible,     :boolean, :default => true
+  add_column  :foo,       :passphrase,  :string,  :limit => 40
 
 Example
 =======
